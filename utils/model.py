@@ -1,5 +1,7 @@
 import torch.nn as nn
-from config import pre_prosessing_config
+from utils.config import pre_prosessing_config
+import matplotlib.pyplot as plt
+import librosa
 
 
 class CRNN(nn.Module):
@@ -8,10 +10,10 @@ class CRNN(nn.Module):
 
         self.cnn = self._cnn_backbone()
         self.map_to_seq = nn.Linear(96, 96)
-        self.rnn1 = nn.LSTM(96, 96, bidirectional=True)
-        self.rnn2 = nn.LSTM(192, 96, bidirectional=True)
+        self.rnn1 = nn.LSTM(96, 96, bidirectional=True, batch_first=True)
+        self.rnn2 = nn.LSTM(192, 96, bidirectional=True, batch_first=True)
         self.dense = nn.Linear(192, 2)
-        self.softmax = nn.Softmax(dim=1)
+        self.softmax = nn.Softmax(dim=2)
 
     def _cnn_backbone(self):
         channels = 96
@@ -68,21 +70,22 @@ class CRNN(nn.Module):
             ),
         )
         cnn_backbone.add_module("ReLu3", relu)
-        cnn_backbone.add_module("batchnorm0", nn.BatchNorm1d(3))
+        cnn_backbone.add_module("batchnorm0", nn.BatchNorm2d(96))
         cnn_backbone.add_module("MaxPool2d3", nn.MaxPool2d(kernel_size=(2, 1)))
 
         return cnn_backbone
 
     def forward(self, sample):
         sample = self.cnn(sample)
-        channel, height, width = sample.size()
-        sample = sample.view(channel * height, width)
-        sample = sample.permute(1, 0)
+        batch_size, channel, height, width = sample.size()
+        sample = sample.view(batch_size, channel * height, width)
+        sample = sample.permute(0, 2, 1)
         sample = self.map_to_seq(sample)
         sample, _ = self.rnn1(sample)
         sample, _ = self.rnn2(sample)
         logits = self.dense(sample)
         predictions = self.softmax(logits)
+        predictions = predictions.permute(0, 2, 1)
         return predictions
 
 
@@ -91,6 +94,8 @@ if __name__ == "__main__":
     import torch
     from dataset import GoGoDataset
     from config import pre_prosessing_config, mel_specrogram_config
+    from tools import ConfusionMatrix
+    from torch.utils.data import DataLoader
 
     TARGET_SAMPLE_RATE = pre_prosessing_config["target_sample_rate"]
 
@@ -104,12 +109,19 @@ if __name__ == "__main__":
 
     device = "cude" if torch.cuda.is_available() else "cpu"
 
-    gogo = GoGoDataset("gogo-owl", TARGET_SAMPLE_RATE, transformation, device=device)
-    print(gogo[0][0].shape)
-    sample = gogo[0][0][:, :, :313]
-    print(sample.shape)
+    gogo = GoGoDataset(
+        "gogo-owl", TARGET_SAMPLE_RATE, transformation, device=device, mode="val"
+    )
+    loader = DataLoader(dataset=gogo, batch_size=1, shuffle=False)
     model = CRNN()
-    output = model.forward(sample)
-    print(output[0])
-    pred = (output[0] == torch.max(output[0])).nonzero(as_tuple=True)[0].item()
-    print(pred)
+    for sample, label in loader:
+        sample = sample[:, :, :, :313]
+        output = model.forward(sample)
+        print(output)
+        # cm = ConfusionMatrix()
+        # for o, l in zip(output, gogo[0][1][:313]):
+        #     pred = (o == torch.max(o)).nonzero(as_tuple=True)[0].item()
+        #     print(pred, l, o)
+        #     cm.judge(pred, l)
+        # cm.summary()
+        # print(cm)

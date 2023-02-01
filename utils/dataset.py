@@ -1,10 +1,10 @@
 import os
 import torch
 import torchaudio
+from math import ceil
 from pathlib import Path, PurePath
 from torch.utils.data import Dataset
-from config import mel_specrogram_config
-from math import ceil
+from utils.config import mel_specrogram_config
 
 DATASETS_DIR = PurePath.joinpath(Path(__file__).parent.parent, Path("datasets"))
 
@@ -15,10 +15,16 @@ class GoGoDataset(Dataset):
         dataset_dirname: str,
         target_sample_rate: int,
         transform,
-        device="cpu",
+        mode: str = "train",
+        device: str = "cpu",
     ):
+        assert mode == "train" or mode == "val", "only train or val mode"
+
         self.target_sample_rate = target_sample_rate
-        self.target_dataset_dir = self._get_target_dataset_dir(dataset_dirname)
+        self.mode = mode
+        self.target_dataset_dir = self._get_target_dataset_dir(
+            dataset_dirname, self.mode
+        )
         self.sample_names = self._all_sample_filename()
         self.annotations = self._all_annotations()
         self.device = device
@@ -43,14 +49,15 @@ class GoGoDataset(Dataset):
         signal = self.transform(signal)
         spectrogram_width = signal.shape[2]
         label = self._generate_annotation(index, spectrogram_width, ori_num_sample)
-        return signal, label
+        return signal, torch.tensor(label)
 
-    def _get_target_dataset_dir(self, dataset_dirname):
-        return Path.joinpath(DATASETS_DIR, Path(dataset_dirname))
+    def _get_target_dataset_dir(self, dataset_dirname, mode):
+        return Path.joinpath(DATASETS_DIR, Path(dataset_dirname), Path(mode))
 
     def _all_sample_filename(self) -> list:
         dir_path = Path.joinpath(self.target_dataset_dir, Path("audio"))
-        return os.listdir(dir_path)
+        files = [file for file in os.listdir(dir_path) if file.lower().endswith(".wav")]
+        return files
 
     def _all_annotations(self) -> set:
         dir_path = Path.joinpath(self.target_dataset_dir, Path("annotation"))

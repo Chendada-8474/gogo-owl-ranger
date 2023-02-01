@@ -14,10 +14,9 @@ mel_specrogram_config = {
 }
 
 training_config = {
-    "epochs": 50,
-    "learning_rate": 0.001,
-    "batch_size": 8,
+    "epochs": 25,
+    "learning_rate": 0.0005,
+    "batch_size": 1,
     "dataset": "gogo-owl",
-    "val_proportion": 0.1,
     "cpu_workers": cpu_count() // 2,
 }

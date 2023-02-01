@@ -13,7 +13,14 @@ class ConfusionMatrix:
         self.recall = None
         self.f1_score = None
 
+    def __str__(self):
+        return (
+            "confision matrix%s\naccuracy: %s\npercision: %s\nrecall: %s\nf1_score: %s"
+            % (self.matrix, self.accuracy, self.percision, self.recall, self.f1_score)
+        )
+
     def judge(self, prediction: int, ground_truth: int):
+
         assert (prediction == 0 or prediction == 1) and (
             ground_truth == 0 or ground_truth == 1
         )
@@ -31,12 +38,19 @@ class ConfusionMatrix:
         self.matrix = [[self.tp, self.fp], [self.fn, self.tn]]
 
     def summary(self):
-        self.accuracy = (self.tp + self.tn) / sum((self.tp, self.fp, self.fn, self.tn))
-        self.percision = self.tp / (self.tp + self.fp)
-        self.recall = self.tp / (self.tp + self.fn)
-        self.f1_score = (2 * self.percision * self.recall) / (
-            self.percision + self.recall
-        )
+        num_sample = sum((self.tp, self.fp, self.fn, self.tn))
+        num_positive = self.tp + self.fp
+        num_true_positive = self.tp + self.fn
+        self.accuracy = (self.tp + self.tn) / num_sample
+
+        if num_positive:
+            self.percision = self.tp / num_positive
+        if num_true_positive:
+            self.recall = self.tp / num_true_positive
+
+        if self.percision and self.recall:
+            pr = self.percision + self.recall
+            self.f1_score = (2 * self.percision * self.recall) / pr
 
 
 def slice_piece(
