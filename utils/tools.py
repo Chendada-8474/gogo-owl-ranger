@@ -64,3 +64,52 @@ def slice_piece(
     if make_up and res:
         start_time_points.append(sample_width - sample_hop)
     return start_time_points
+
+
+class PrograssBar:
+    def __init__(self) -> None:
+        self.title = f"loss       accuracy   percision  recall     f1_score"
+
+    @staticmethod
+    def progress_bar(
+        i,
+        num_sample,
+        loss,
+        epoch,
+        num_epoch,
+        accuracy=None,
+        percision=None,
+        recall=None,
+        f1_score=None,
+    ):
+        loss = round(loss, 4) if loss else str(loss)
+        accuracy = round(accuracy, 4) if accuracy else str(accuracy)
+        percision = round(percision, 4) if percision else str(percision)
+        recall = round(recall, 4) if recall else str(recall)
+        f1_score = round(f1_score, 4) if f1_score else str(f1_score)
+
+        progress = "█" * ((i * 20) // num_sample)
+        unprogess = " " * (19 - (i * 20) // num_sample)
+        percent = "%s/%s" % (i + 1, num_sample)
+        loss = _fill_zero(loss)
+        accuracy = _fill_zero(accuracy)
+        percision = _fill_zero(percision)
+        recall = _fill_zero(recall)
+        f1_score = _fill_zero(f1_score)
+
+        print(
+            f"\r{loss}{accuracy}{percision}{recall}{f1_score} [{progress}{unprogess}] {percent} epoch {epoch}/{num_epoch}",
+            end="",
+        )
+
+    @staticmethod
+    def line_break():
+        print("\r")
+
+
+def _fill_zero(string, l=11):
+    return "%s%s" % (str(string), " " * (l - len(str(string))))
+
+
+if __name__ == "__main__":
+    pass

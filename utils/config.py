@@ -16,7 +16,8 @@ mel_specrogram_config = {
 training_config = {
     "epochs": 25,
     "learning_rate": 0.0005,
-    "batch_size": 1,
-    "dataset": "gogo-owl",
+    "batch_size": 16,
+    "dataset": "gogo-nightjar",
     "cpu_workers": cpu_count() // 2,
+    "skip_false_sample": True,
 }

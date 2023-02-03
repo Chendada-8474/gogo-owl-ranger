@@ -138,3 +138,4 @@ test.py
 data
 python-venv
 .DS_Store
+datasets/

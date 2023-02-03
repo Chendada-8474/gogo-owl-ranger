@@ -20,6 +20,7 @@ def evaluate(model: CRNN, dataloader: DataLoader, piece_width):
             for pred, ground_truth in zip(predictions.permute(0, 2, 1)[0], label[0]):
                 pred = (pred == torch.max(pred)).nonzero(as_tuple=True)[0].item()
                 confusion_matrix.judge(pred, ground_truth)
+
     confusion_matrix.summary()
     accuracy = confusion_matrix.accuracy
     percision = confusion_matrix.percision

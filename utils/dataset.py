@@ -1,10 +1,15 @@
 import os
 import torch
+import librosa
 import torchaudio
+import torchaudio.functional as F
+import numpy as np
 from math import ceil
 from pathlib import Path, PurePath
 from torch.utils.data import Dataset
 from utils.config import mel_specrogram_config
+
+# from config import mel_specrogram_config
 
 DATASETS_DIR = PurePath.joinpath(Path(__file__).parent.parent, Path("datasets"))
 
@@ -14,7 +19,6 @@ class GoGoDataset(Dataset):
         self,
         dataset_dirname: str,
         target_sample_rate: int,
-        transform,
         mode: str = "train",
         device: str = "cpu",
     ):
@@ -28,7 +32,17 @@ class GoGoDataset(Dataset):
         self.sample_names = self._all_sample_filename()
         self.annotations = self._all_annotations()
         self.device = device
-        self.transform = transform.to(self.device)
+        self.mel_specrogram = torchaudio.transforms.MelSpectrogram(
+            sample_rate=target_sample_rate,
+            n_fft=mel_specrogram_config["n_fft"],
+            n_mels=mel_specrogram_config["n_mels"],
+            f_max=mel_specrogram_config["f_max"],
+            f_min=mel_specrogram_config["f_min"],
+            normalized=True,
+        ).to(self.device)
+        self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(
+            stype="power", top_db=80
+        )
 
     def __len__(self):
         return len(self.sample_names)
@@ -46,7 +60,8 @@ class GoGoDataset(Dataset):
         ori_num_sample = signal.shape[1]
         signal = self._resample_if_necessary(signal, sample_rate)
         signal = self._mix_down_if_necessary(signal)
-        signal = self.transform(signal)
+        signal = self.mel_specrogram(signal)
+        signal = librosa.power_to_db(signal, ref=np.max)
         spectrogram_width = signal.shape[2]
         label = self._generate_annotation(index, spectrogram_width, ori_num_sample)
         return signal, torch.tensor(label)

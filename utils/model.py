@@ -1,7 +1,7 @@
 import torch.nn as nn
 from utils.config import pre_prosessing_config
-import matplotlib.pyplot as plt
-import librosa
+
+# from config import pre_prosessing_config
 
 
 class CRNN(nn.Module):
@@ -17,7 +17,7 @@ class CRNN(nn.Module):
 
     def _cnn_backbone(self):
         channels = 96
-        relu = nn.LeakyReLU()
+        leaky_relu = nn.LeakyReLU()
         cnn_backbone = nn.Sequential()
 
         cnn_backbone.add_module(
@@ -30,8 +30,8 @@ class CRNN(nn.Module):
                 padding=1,
             ),
         )
-        cnn_backbone.add_module("ReLu0", relu)
-        cnn_backbone.add_module("MaxPool2d0", nn.MaxPool2d(kernel_size=(5, 1)))
+        cnn_backbone.add_module("ReLu0", leaky_relu)
+        cnn_backbone.add_module("MaxPool2d0", nn.MaxPool2d(kernel_size=(4, 1)))
 
         cnn_backbone.add_module(
             "cnn1",
@@ -43,8 +43,8 @@ class CRNN(nn.Module):
                 padding=1,
             ),
         )
-        cnn_backbone.add_module("ReLu1", relu)
-        cnn_backbone.add_module("MaxPool2d1", nn.MaxPool2d(kernel_size=(2, 1)))
+        cnn_backbone.add_module("ReLu1", leaky_relu)
+        cnn_backbone.add_module("MaxPool2d1", nn.MaxPool2d(kernel_size=(4, 1)))
 
         cnn_backbone.add_module(
             "cnn2",
@@ -56,7 +56,8 @@ class CRNN(nn.Module):
                 padding=1,
             ),
         )
-        cnn_backbone.add_module("ReLu2", relu)
+        cnn_backbone.add_module("batchnorm0", nn.BatchNorm2d(96))
+        cnn_backbone.add_module("ReLu2", leaky_relu)
         cnn_backbone.add_module("MaxPool2d2", nn.MaxPool2d(kernel_size=(2, 1)))
 
         cnn_backbone.add_module(
@@ -69,14 +70,25 @@ class CRNN(nn.Module):
                 padding=1,
             ),
         )
-        cnn_backbone.add_module("ReLu3", relu)
-        cnn_backbone.add_module("batchnorm0", nn.BatchNorm2d(96))
+        cnn_backbone.add_module("batchnorm1", nn.BatchNorm2d(96))
+        cnn_backbone.add_module("ReLu3", leaky_relu)
         cnn_backbone.add_module("MaxPool2d3", nn.MaxPool2d(kernel_size=(2, 1)))
 
         return cnn_backbone
 
     def forward(self, sample):
+        import matplotlib.pyplot as plt
+        import librosa
+
+        # fig, axs = plt.subplots(2)
+        # axs[0].imshow(sample[0][0], origin="lower", aspect="auto")
+
         sample = self.cnn(sample)
+
+        # axs[1].imshow(sample[0][0].detach().numpy(), origin="lower", aspect="auto")
+        # plt.show()
+        # exit()
+
         batch_size, channel, height, width = sample.size()
         sample = sample.view(batch_size, channel * height, width)
         sample = sample.permute(0, 2, 1)
@@ -117,7 +129,6 @@ if __name__ == "__main__":
     for sample, label in loader:
         sample = sample[:, :, :, :313]
         output = model.forward(sample)
-        print(output)
         # cm = ConfusionMatrix()
         # for o, l in zip(output, gogo[0][1][:313]):
         #     pred = (o == torch.max(o)).nonzero(as_tuple=True)[0].item()
