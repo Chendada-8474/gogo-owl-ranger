@@ -52,7 +52,7 @@ def read_predict_config(model_path) -> dict:
     return model_info
 
 
-def predict(model, loader, model_info):
+def predict(model, loader, model_info, device="cpu"):
     target_sr = model_info["target_sample_rate"]
     sample_duration = model_info["sample_duration"]
     hop = model_info["n_fft"] // 2
@@ -61,6 +61,7 @@ def predict(model, loader, model_info):
     results = defaultdict(list)
 
     for audio, paths in tqdm(loader):
+        audio.to(device)
         start_points = slice_piece(
             audio.shape[3], piece_width, piece_width, shuffle=False, make_up=True
         )
@@ -105,7 +106,7 @@ def save_result(result: pd.DataFrame, save_path, time_stemp=True):
     ext = ".csv"
     if time_stemp:
         time_now = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
-        filename = "%s_%s" % (time_now, time_now)
+        filename = "%s_%s" % (filename, time_now)
     filename += ext
     if not os.path.isdir(save_path):
         save_path = Path(save_path).parent
@@ -126,6 +127,7 @@ def main():
 
     model = CRNN()
     model.load_state_dict(torch.load(model_path))
+    model.to(device)
     model.eval()
 
     predict_set = PredictDataset(source_path, model_info, device=device)
@@ -133,7 +135,7 @@ def main():
     predict_loader = DataLoader(
         dataset=predict_set, batch_size=batch_size, shuffle=False
     )
-    predictions = predict(model, predict_loader, model_info)
+    predictions = predict(model, predict_loader, model_info, device=device)
 
     results = {
         "file_name": [],

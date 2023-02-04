@@ -45,6 +45,8 @@ def train(
         model.train()
 
         for j, (sample, label) in enumerate(train_loader):
+            sample.to(device)
+            label.to(device)
 
             start_time_points = slice_piece(
                 sample.shape[3], piece_width, sample_hop, shuffle=True
@@ -116,7 +118,8 @@ def main():
     model = CRNN()
     model.to(device)
 
-    loss_func = torch.nn.BCELoss()
+    loss_func = torch.nn.BCELoss().to(device)
+    loss_func = loss_func.to(device)
     optimiser = torch.optim.Adam(model.parameters(), lr=LR)
 
     last_model, best_model, training_indicator = train(
@@ -129,15 +132,6 @@ def main():
         training_indicator,
         model_name=training_config["model_name"],
     )
-
-    import matplotlib.pyplot as plt
-
-    test_piece = val_set[1][0][:, :, :313].unsqueeze(1)
-    predict = model(test_piece).detach().numpy()
-    fig, axs = plt.subplots(2)
-    axs[0].plot(predict[0][0])
-    axs[1].imshow(test_piece[0][0], origin="lower", aspect="auto")
-    plt.show()
 
 
 if __name__ == "__main__":
