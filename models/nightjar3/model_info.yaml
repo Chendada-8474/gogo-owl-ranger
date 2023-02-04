@@ -1,7 +1,0 @@
-target_sample_rate: 16000
-sample_duration: 5
-sample_hop: 1
-n_fft: 512
-n_mels: 64
-f_min: 1
-f_max: 8000
