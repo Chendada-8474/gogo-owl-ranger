@@ -94,37 +94,4 @@ class CRNN(nn.Module):
 
 
 if __name__ == "__main__":
-    import torchaudio
-    import torch
-    from dataset import GoGoDataset
-    from config import pre_prosessing_config, mel_specrogram_config
-    from tools import ConfusionMatrix
-    from torch.utils.data import DataLoader
-
-    TARGET_SAMPLE_RATE = pre_prosessing_config["target_sample_rate"]
-
-    transformation = torchaudio.transforms.MelSpectrogram(
-        sample_rate=TARGET_SAMPLE_RATE,
-        n_fft=mel_specrogram_config["n_fft"],
-        n_mels=mel_specrogram_config["n_mels"],
-        f_max=mel_specrogram_config["f_max"],
-        f_min=mel_specrogram_config["f_min"],
-    )
-
-    device = "cude" if torch.cuda.is_available() else "cpu"
-
-    gogo = GoGoDataset(
-        "gogo-owl", TARGET_SAMPLE_RATE, transformation, device=device, mode="val"
-    )
-    loader = DataLoader(dataset=gogo, batch_size=1, shuffle=False)
-    model = CRNN()
-    for sample, label in loader:
-        sample = sample[:, :, :, :313]
-        output = model.forward(sample)
-        # cm = ConfusionMatrix()
-        # for o, l in zip(output, gogo[0][1][:313]):
-        #     pred = (o == torch.max(o)).nonzero(as_tuple=True)[0].item()
-        #     print(pred, l, o)
-        #     cm.judge(pred, l)
-        # cm.summary()
-        # print(cm)
+    pass

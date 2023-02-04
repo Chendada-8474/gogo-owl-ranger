@@ -1,12 +1,13 @@
 import os
 import torch
 import torchaudio
+import torchaudio.transforms as AT
 import torchvision.transforms as VT
-import torchaudio.transforms as T
-from math import ceil
 from pathlib import Path, PurePath
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, dataset
+from torch_audiomentations import Compose, Gain
 from utils.config import mel_specrogram_config
+from math import ceil
 
 DATASETS_DIR = PurePath.joinpath(Path(__file__).parent.parent, Path("datasets"))
 
@@ -19,7 +20,9 @@ class GoGoDataset(Dataset):
         mode: str = "train",
         device: str = "cpu",
     ):
-        assert mode == "train" or mode == "val", "only train or val mode"
+        assert (
+            mode == "train" or mode == "val" or mode == "predict"
+        ), "only train, val or predict mode"
 
         self.target_sample_rate = target_sample_rate
         self.mode = mode
@@ -30,7 +33,8 @@ class GoGoDataset(Dataset):
         self.sample_names = self._all_sample_filename()
         self.annotations = self._all_annotations()
         self.device = device
-        self.mel_specrogram = T.MelSpectrogram(
+        self.augmentation = Compose(transforms=[Gain()])
+        self.mel_specrogram = AT.MelSpectrogram(
             sample_rate=target_sample_rate,
             n_fft=mel_specrogram_config["n_fft"],
             n_mels=mel_specrogram_config["n_mels"],
@@ -39,12 +43,13 @@ class GoGoDataset(Dataset):
             normalized=True,
         ).to(self.device)
 
-        self.amplitude_to_db = T.AmplitudeToDB(stype="power", top_db=80)
+        self.amplitude_to_db = AT.AmplitudeToDB(stype="power", top_db=80)
 
     def __len__(self):
         return len(self.sample_names)
 
     def __getitem__(self, index):
+
         audio_path = self._get_audio_sample_path(index)
 
         try:
@@ -57,6 +62,7 @@ class GoGoDataset(Dataset):
         ori_num_sample = signal.shape[1]
         signal = self._resample_if_necessary(signal, sample_rate)
         signal = self._mix_down_if_necessary(signal)
+        signal = self.augmentation(signal.unsqueeze(1)).squeeze(1)
         signal = self.mel_specrogram(signal)
         signal = self.amplitude_to_db(signal)
         normalize = VT.Normalize(signal.mean(), signal.std())
@@ -99,7 +105,7 @@ class GoGoDataset(Dataset):
         )
 
         if sample_rate > self.target_sample_rate:
-            resampler = T.Resample(
+            resampler = AT.Resample(
                 sample_rate,
                 self.target_sample_rate,
             )
@@ -148,20 +154,52 @@ class GoGoDataset(Dataset):
         return time_ranges
 
 
+class PredictDataset(Dataset):
+    def __init__(self, source_path, model_info: dict, device="cpu") -> None:
+        self.device = device
+        self.source_path = source_path
+        self.target_sample_rate = model_info["target_sample_rate"]
+        self.audio_paths = self._all_audio_paths(self.source_path)
+
+        self.mel_specrogram = AT.MelSpectrogram(
+            sample_rate=self.target_sample_rate,
+            n_fft=model_info["n_fft"],
+            n_mels=model_info["n_mels"],
+            f_max=model_info["f_max"],
+            f_min=model_info["f_min"],
+            normalized=True,
+        ).to(self.device)
+
+        self.amplitude_to_db = AT.AmplitudeToDB(stype="power", top_db=80)
+
+    def __len__(self):
+        return len(self.audio_paths)
+
+    def __getitem__(self, index):
+        try:
+            signal, sample_rate = torchaudio.load(self.audio_paths[index])
+            signal = signal.to(self.device)
+        except IOError:
+            print("Corrupted audio for %d" % index)
+            return self[index + 1]
+        signal = self.mel_specrogram(signal)
+        signal = self.amplitude_to_db(signal)
+        normalize = VT.Normalize(signal.mean(), signal.std())
+        signal = normalize(signal)
+        signal -= signal.min()
+        signal /= signal.max()
+        return signal, str(self.audio_paths[index])
+
+    def _all_audio_paths(self, source_path) -> list:
+        source_path = Path(source_path)
+        if source_path.is_dir():
+            return [
+                PurePath.joinpath(source_path, fn)
+                for fn in os.listdir(source_path)
+                if fn.lower().endswith(".wav")
+            ]
+        return [source_path]
+
+
 if __name__ == "__main__":
-    from config import pre_prosessing_config
-
-    TARGET_SAMPLE_RATE = pre_prosessing_config["target_sample_rate"]
-
-    transformation = T.MelSpectrogram(
-        sample_rate=TARGET_SAMPLE_RATE,
-        n_fft=mel_specrogram_config["n_fft"],
-        n_mels=mel_specrogram_config["n_mels"],
-        f_max=mel_specrogram_config["f_max"],
-        f_min=mel_specrogram_config["f_min"],
-    )
-
-    device = "cude" if torch.cuda.is_available() else "cpu"
-
-    gogo = GoGoDataset("gogo-owl", TARGET_SAMPLE_RATE, transformation, device=device)
-    print(gogo[0])
+    pass

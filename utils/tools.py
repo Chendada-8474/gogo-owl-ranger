@@ -1,4 +1,11 @@
+import os
 import random
+import torch
+from pathlib import Path, PurePath
+from pandas import DataFrame
+from utils.config import *
+
+ROOT_DIR = Path(os.path.dirname(os.path.abspath(__file__))).parent
 
 
 class ConfusionMatrix:
@@ -56,7 +63,11 @@ class ConfusionMatrix:
 def slice_piece(
     sample_width, piece_width, sample_hop, shuffle: bool = True, make_up=False
 ) -> list:
-    num_piece = (sample_width - piece_width) // sample_hop
+    num_piece = (
+        (sample_width - piece_width) // sample_hop
+        if piece_width > sample_hop
+        else sample_width // sample_hop
+    )
     start_time_points = [n * sample_hop for n in range(num_piece)]
     if shuffle:
         random.shuffle(start_time_points)
@@ -109,6 +120,36 @@ class PrograssBar:
     @staticmethod
     def line_break():
         print("\r")
+
+
+def save_model(best_model, last_model, indicator: DataFrame, model_name: str = "exp"):
+    models_dir = PurePath.joinpath(Path(ROOT_DIR), Path("models"))
+    new_model_name = PurePath.joinpath(models_dir, Path(model_name))
+    num = 1
+    while new_model_name.exists():
+        new_model_name = PurePath.joinpath(models_dir, Path("%s%s" % (model_name, num)))
+        num += 1
+    os.mkdir(new_model_name)
+
+    torch.save(
+        best_model.state_dict(),
+        PurePath.joinpath(Path(new_model_name), Path("best.pth")),
+    )
+    torch.save(
+        last_model.state_dict(),
+        PurePath.joinpath(Path(new_model_name), Path("last.pth")),
+    )
+
+    info_path = PurePath.joinpath(Path(new_model_name), Path("model_info.yaml"))
+    with open(info_path, "w") as info:
+        for k, v in pre_prosessing_config.items():
+            info.write("%s: %s\n" % (k, v))
+        for k, v in mel_specrogram_config.items():
+            info.write("%s: %s\n" % (k, v))
+
+    log_path = PurePath.joinpath(Path(new_model_name), Path("training_log.csv"))
+    indicator.to_csv(log_path, index=False)
+    print("results have been saved to %s" % new_model_name)
 
 
 def _fill_zero(string, l=11):

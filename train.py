@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 from utils.dataset import GoGoDataset
 from utils.model import CRNN
 from utils.config import *
-from utils.tools import slice_piece, skip_false_sample, PrograssBar
+from utils.tools import slice_piece, skip_false_sample, save_model, PrograssBar
 from utils.evaluate import evaluate
 
 
@@ -28,7 +28,7 @@ def train(
     model: CRNN,
     train_loader: DataLoader,
     val_loader: DataLoader,
-    loss_func: torch.nn.CrossEntropyLoss,
+    loss_func: torch.nn.BCELoss,
     optimiser: torch.optim.Adam,
     device="cpu",
 ):
@@ -51,8 +51,8 @@ def train(
             )
 
             for s in start_time_points:
-                piece_sample = sample[:, :, :, s : s + piece_width + 1]
-                piece_label = label[:, s : s + piece_width + 1]
+                piece_sample = sample[:, :, :, s : s + piece_width]
+                piece_label = label[:, s : s + piece_width]
                 if skip_false_sample(piece_label, skip_rate=SKIP_FALSE_RATE):
                     continue
                 optimiser.zero_grad()
@@ -94,10 +94,6 @@ def train(
     return model, best_model, training_indicator
 
 
-def save_model(model, save_to=""):
-    pass
-
-
 def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -127,10 +123,16 @@ def main():
         model, train_loader, val_loader, loss_func, optimiser, device=device
     )
 
-    import matplotlib.pyplot as plt
-    import librosa
+    save_model(
+        best_model,
+        last_model,
+        training_indicator,
+        model_name=training_config["model_name"],
+    )
 
-    test_piece = val_set[0][0][:, :, :313].unsqueeze(1)
+    import matplotlib.pyplot as plt
+
+    test_piece = val_set[1][0][:, :, :313].unsqueeze(1)
     predict = model(test_piece).detach().numpy()
     fig, axs = plt.subplots(2)
     axs[0].plot(predict[0][0])
