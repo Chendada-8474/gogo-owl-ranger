@@ -121,6 +121,7 @@ def main():
     source_path = opt.source
     batch_size = opt.batch
     interval = opt.interval
+    print(model_path)
     model_info = read_predict_config(model_path)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -146,7 +147,9 @@ def main():
     for k, v in predictions.items():
         predictions[k] = extract_max_in_interval(v, interval, model_info)
         results["file_name"] += [k] * len(predictions[k])
-        results["time_s"] += [interval * i for i in range(len(predictions[k]))]
+        results["time_s"] += [
+            round(interval * i, 1) for i in range(len(predictions[k]))
+        ]
         results["probability"] += predictions[k]
 
     save_result(pd.DataFrame(results), source_path)
