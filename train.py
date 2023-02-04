@@ -59,7 +59,9 @@ def train(
                     continue
                 optimiser.zero_grad()
                 predictions = model(piece_sample)
-                loss = loss_func(predictions, piece_label.float().unsqueeze(1))
+                loss = loss_func(
+                    predictions.to(device), piece_label.to(device).float().unsqueeze(1)
+                )
                 sum_loss += loss.item()
                 num_loss += 1
                 loss.backward()

@@ -17,8 +17,8 @@ training_config = {
     "epochs": 8,
     "learning_rate": 0.0005,
     "batch_size": 8,
-    "dataset": "gogo-nightjar",
+    "dataset": "gogo-owl",
     "cpu_workers": cpu_count() // 2,
     "skip_false_rate": 0.6,
-    "model_name": "nightjar",
+    "model_name": "grassowl",
 }
