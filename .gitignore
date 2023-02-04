@@ -140,3 +140,4 @@ python-venv
 .DS_Store
 datasets/
 models/*
+!models
