@@ -1,15 +1,12 @@
 import os
 import torch
-import librosa
 import torchaudio
-import torchaudio.functional as F
-import numpy as np
+import torchvision.transforms as VT
+import torchaudio.transforms as T
 from math import ceil
 from pathlib import Path, PurePath
 from torch.utils.data import Dataset
 from utils.config import mel_specrogram_config
-
-# from config import mel_specrogram_config
 
 DATASETS_DIR = PurePath.joinpath(Path(__file__).parent.parent, Path("datasets"))
 
@@ -29,10 +26,11 @@ class GoGoDataset(Dataset):
         self.target_dataset_dir = self._get_target_dataset_dir(
             dataset_dirname, self.mode
         )
+
         self.sample_names = self._all_sample_filename()
         self.annotations = self._all_annotations()
         self.device = device
-        self.mel_specrogram = torchaudio.transforms.MelSpectrogram(
+        self.mel_specrogram = T.MelSpectrogram(
             sample_rate=target_sample_rate,
             n_fft=mel_specrogram_config["n_fft"],
             n_mels=mel_specrogram_config["n_mels"],
@@ -40,9 +38,8 @@ class GoGoDataset(Dataset):
             f_min=mel_specrogram_config["f_min"],
             normalized=True,
         ).to(self.device)
-        self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(
-            stype="power", top_db=80
-        )
+
+        self.amplitude_to_db = T.AmplitudeToDB(stype="power", top_db=80)
 
     def __len__(self):
         return len(self.sample_names)
@@ -61,9 +58,15 @@ class GoGoDataset(Dataset):
         signal = self._resample_if_necessary(signal, sample_rate)
         signal = self._mix_down_if_necessary(signal)
         signal = self.mel_specrogram(signal)
-        signal = librosa.power_to_db(signal, ref=np.max)
+        signal = self.amplitude_to_db(signal)
+        normalize = VT.Normalize(signal.mean(), signal.std())
+        signal = normalize(signal)
+        signal -= signal.min()
+        signal /= signal.max()
         spectrogram_width = signal.shape[2]
+
         label = self._generate_annotation(index, spectrogram_width, ori_num_sample)
+
         return signal, torch.tensor(label)
 
     def _get_target_dataset_dir(self, dataset_dirname, mode):
@@ -96,7 +99,7 @@ class GoGoDataset(Dataset):
         )
 
         if sample_rate > self.target_sample_rate:
-            resampler = torchaudio.transforms.Resample(
+            resampler = T.Resample(
                 sample_rate,
                 self.target_sample_rate,
             )
@@ -150,7 +153,7 @@ if __name__ == "__main__":
 
     TARGET_SAMPLE_RATE = pre_prosessing_config["target_sample_rate"]
 
-    transformation = torchaudio.transforms.MelSpectrogram(
+    transformation = T.MelSpectrogram(
         sample_rate=TARGET_SAMPLE_RATE,
         n_fft=mel_specrogram_config["n_fft"],
         n_mels=mel_specrogram_config["n_mels"],

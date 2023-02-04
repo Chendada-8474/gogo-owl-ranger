@@ -1,4 +1,3 @@
-import torch
 from torch.utils.data import DataLoader
 from utils.tools import ConfusionMatrix, slice_piece
 from utils.model import CRNN
@@ -18,7 +17,7 @@ def evaluate(model: CRNN, dataloader: DataLoader, piece_width):
             label = labels[:, s : s + piece_width + 1]
             predictions = model(piece)
             for pred, ground_truth in zip(predictions.permute(0, 2, 1)[0], label[0]):
-                pred = (pred == torch.max(pred)).nonzero(as_tuple=True)[0].item()
+                pred = round(pred.item())
                 confusion_matrix.judge(pred, ground_truth)
 
     confusion_matrix.summary()

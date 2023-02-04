@@ -66,6 +66,10 @@ def slice_piece(
     return start_time_points
 
 
+def skip_false_sample(label, skip_rate: float = 0.0):
+    return all(l.item() == 0 for l in label[0]) and random.random() < skip_rate
+
+
 class PrograssBar:
     def __init__(self) -> None:
         self.title = f"loss       accuracy   percision  recall     f1_score"
@@ -82,15 +86,15 @@ class PrograssBar:
         recall=None,
         f1_score=None,
     ):
+        i += 1
         loss = round(loss, 4) if loss else str(loss)
         accuracy = round(accuracy, 4) if accuracy else str(accuracy)
         percision = round(percision, 4) if percision else str(percision)
         recall = round(recall, 4) if recall else str(recall)
         f1_score = round(f1_score, 4) if f1_score else str(f1_score)
-
         progress = "█" * ((i * 20) // num_sample)
-        unprogess = " " * (19 - (i * 20) // num_sample)
-        percent = "%s/%s" % (i + 1, num_sample)
+        unprogess = " " * (20 - (i * 20) // num_sample)
+        percent = "%s/%s" % (i, num_sample)
         loss = _fill_zero(loss)
         accuracy = _fill_zero(accuracy)
         percision = _fill_zero(percision)
@@ -98,7 +102,7 @@ class PrograssBar:
         f1_score = _fill_zero(f1_score)
 
         print(
-            f"\r{loss}{accuracy}{percision}{recall}{f1_score} [{progress}{unprogess}] {percent} epoch {epoch}/{num_epoch}",
+            f"\r{loss}{accuracy}{percision}{recall}{f1_score} [{progress}{unprogess}] {percent}     epoch {epoch}/{num_epoch}",
             end="",
         )
 

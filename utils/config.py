@@ -14,10 +14,10 @@ mel_specrogram_config = {
 }
 
 training_config = {
-    "epochs": 25,
+    "epochs": 5,
     "learning_rate": 0.0005,
-    "batch_size": 16,
+    "batch_size": 8,
     "dataset": "gogo-nightjar",
     "cpu_workers": cpu_count() // 2,
-    "skip_false_sample": True,
+    "skip_false_rate": 1,
 }
