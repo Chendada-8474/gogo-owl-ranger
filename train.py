@@ -98,8 +98,17 @@ def train(
     return model, best_model, training_indicator
 
 
+def get_device_info(device):
+    torch_version = "%s %s" % ("torch", torch.__version__)
+    device_name = torch.cuda.get_device_name() if device == "cuda" else None
+    device_number = torch.cuda.current_device() if device == "cuda" else None
+    return f"{torch_version} CUDA:{device_number} {device_name}"
+
+
 def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    device_info = get_device_info(device)
+    print(device_info)
 
     train_set = GoGoDataset(
         DATASET_NAME,
