@@ -94,6 +94,12 @@ training_config = {
 }
 ```
 
+Then run the `train.py`
+
+```
+python3 train.py
+```
+
 ### Predict
 
 ```
