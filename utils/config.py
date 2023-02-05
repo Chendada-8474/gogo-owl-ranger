@@ -14,7 +14,7 @@ mel_specrogram_config = {
 }
 
 training_config = {
-    "epochs": 20,  # number of training epoch
+    "epochs": 5,  # number of training epoch
     "learning_rate": 0.0005,
     "batch_size": 16,
     "dataset": "gogo-owl",  # traning dataset folder name

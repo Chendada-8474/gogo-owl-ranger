@@ -160,7 +160,7 @@ def main():
     mel_hop = model_info["n_fft"] // 2
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    device_info = get_device_info()
+    device_info = get_device_info(device)
     print(device_info)
 
     model = CRNN()
