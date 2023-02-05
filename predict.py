@@ -11,6 +11,7 @@ from collections import defaultdict
 from utils.model import CRNN
 from utils.dataset import PredictDataset
 from utils.tools import slice_piece, get_device_info
+from utils.animation import animate_mode
 
 
 def restri_batch_size(x):
@@ -56,6 +57,13 @@ def parse_opt():
         default=0.5,
         type=restri_threshold,
         help="the threshold of probability of target detected",
+    )
+    parser.add_argument(
+        "-mo",
+        "--mode",
+        choices=["detect", "animation"],
+        default="detect",
+        type=str,
     )
 
     args = parser.parse_args()
@@ -146,35 +154,9 @@ def save_result(
     print("results have been save to %s" % save_path)
 
 
-def main():
-    opt = parse_opt()
-    model_path = opt.model
-    source_path = opt.source
-    batch_size = opt.batch
-    interval = opt.interval
-    threshold = opt.threshold
-
-    model_info = read_predict_config(model_path)
-
+def detect_mode(predictions, model_info, interval, threshold, source_path):
     target_sr = model_info["target_sample_rate"]
     mel_hop = model_info["n_fft"] // 2
-
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    device_info = get_device_info(device)
-    print(device_info)
-
-    model = CRNN()
-    model.load_state_dict(torch.load(model_path))
-    model.to(device)
-    model.eval()
-
-    predict_set = PredictDataset(source_path, model_info, device=device)
-
-    predict_loader = DataLoader(
-        dataset=predict_set, batch_size=batch_size, shuffle=False
-    )
-    predictions = predict(model, predict_loader, model_info, device=device)
-
     proba_seq = defaultdict(list)
     targ_cov = defaultdict(list)
 
@@ -191,6 +173,40 @@ def main():
 
     save_result(pd.DataFrame(proba_seq), source_path, filename="probabiliy_sequence")
     save_result(pd.DataFrame(targ_cov), source_path, filename="target_coverage")
+
+
+def main():
+    opt = parse_opt()
+    model_path = opt.model
+    source_path = opt.source
+    batch_size = opt.batch
+    interval = opt.interval
+    threshold = opt.threshold
+    mode = opt.mode
+
+    model_info = read_predict_config(model_path)
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device_info = get_device_info(device)
+    print(device_info)
+
+    model = CRNN()
+    model.load_state_dict(torch.load(model_path))
+    model.to(device)
+    model.eval()
+
+    predict_set = PredictDataset(source_path, model_info, device=device)
+
+    predict_loader = DataLoader(
+        dataset=predict_set, batch_size=batch_size, shuffle=False
+    )
+
+    predictions = predict(model, predict_loader, model_info, device=device)
+
+    if mode == "detect":
+        detect_mode(predictions, model_info, interval, threshold, source_path)
+    elif mode == "animation":
+        animate_mode(predictions, predict_set, source_path, model_info, device)
 
 
 if __name__ == "__main__":
