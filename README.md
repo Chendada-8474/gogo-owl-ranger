@@ -51,27 +51,27 @@ gogo-owl-ranger
 ```
 
 #### annotation
--[Audacity Logo](https://www.audacityteam.org/wp-content/themes/wp_audacity/img/logo.png)
+![Audacity Logo](https://www.audacityteam.org/wp-content/themes/wp_audacity/img/logo.png)
 Go Go Owl Ranger eats the annotation of free, open source [Audacity](https://www.audacityteam.org/download/). Please download Audacity before tagging.
 
 ##### 1. Spectrogram Representation
 Show audio as spectrogram. You also can set the *spectrogram representation* as default. edit -> preference -> track
 
--[select_spec](./imgs/select_spec.png)
+![select_spec](./imgs/select_spec.png)
 
 ##### 2. Creating Labels
 select a region of target in the spectrogram and then press Ctrl + B.
--[create_label](./imgs/creat_label.png)
+![create_label](./imgs/creat_label.png)
 
 ##### 3. Export Labels
 copy the audio file name (without extension)
--[copy_filename](./imgs/copy_filename.png)
+![copy_filename](./imgs/copy_filename.png)
 
 go to File -> Export -> Export Labels.
--[export_labels](./imgs/export_labels.png)
+![export_labels](./imgs/export_labels.png)
 
 use the file name we just copied as the new txt file name
--[creat_label](./imgs/tag_filename.png)
+![creat_label](./imgs/tag_filename.png)
 
 Then an annotation for an audio file done!
 
