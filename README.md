@@ -40,12 +40,13 @@ Create a folder under the `datasets`. Name it as any name you want. Then create 
 ```
 gogo-owl-ranger
  ├ datasets
- │  ├ train
- │  │  ├ annotaion  # training annotation txt files here
- │  │  └ audio      # training audio wav files here
- │  └ val
- │     ├ annotaion  # validation annotation txt files here
- │     └ audio      # validation audio wav files here
+ │  └ yourcustomdataset
+ │     ├ train
+ │     │  ├ annotaion  # training annotation txt files here
+ │     │  └ audio      # training audio wav files here
+ │     └ val
+ │        ├ annotaion  # validation annotation txt files here
+ │        └ audio      # validation audio wav files here
  ├ train.py
 ...
 ```
