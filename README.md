@@ -52,6 +52,7 @@ gogo-owl-ranger
 
 #### annotation
 <a href="https://www.audacityteam.org/download/"><img src="https://www.audacityteam.org/wp-content/themes/wp_audacity/img/logo.png" height="100"/></a>
+<br>
 Go Go Owl Ranger eats the annotation of free, open source [Audacity](https://www.audacityteam.org/download/). Please download Audacity before tagging.
 
 ##### 1. Spectrogram Representation
