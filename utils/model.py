@@ -7,12 +7,12 @@ class CRNN(nn.Module):
     def __init__(self):
         super(CRNN, self).__init__()
 
-        self.cnn = self._cnn_backbone()
+        self.backbone = self._cnn_backbone()
         self.map_to_seq = nn.Linear(96, 96)
         self.rnn1 = nn.LSTM(96, 96, bidirectional=True, batch_first=True)
         self.rnn2 = nn.LSTM(192, 96, bidirectional=True, batch_first=True)
         self.dense = nn.Linear(192, 1)
-        self.softmax = nn.Sigmoid()
+        self.sigmoid = nn.Sigmoid()
 
     def _cnn_backbone(self):
 
@@ -80,7 +80,7 @@ class CRNN(nn.Module):
         return cnn_backbone
 
     def forward(self, sample):
-        sample = self.cnn(sample)
+        sample = self.backbone(sample)
         batch_size, channel, height, width = sample.size()
         sample = sample.view(batch_size, channel * height, width)
         sample = sample.permute(0, 2, 1)
@@ -88,7 +88,7 @@ class CRNN(nn.Module):
         sample, _ = self.rnn1(sample)
         sample, _ = self.rnn2(sample)
         logits = self.dense(sample)
-        predictions = self.softmax(logits)
+        predictions = self.sigmoid(logits)
         predictions = predictions.permute(0, 2, 1)
         return predictions
 

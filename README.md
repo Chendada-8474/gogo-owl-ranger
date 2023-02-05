@@ -57,7 +57,7 @@ gogo-owl-ranger
 Go Go Owl Ranger eats the annotation of free, open source [Audacity](https://www.audacityteam.org/download/). Please download Audacity before tagging.
 
 ##### 1. Spectrogram Representation
-Show audio as spectrogram. You also can set the *spectrogram representation* as default. edit -> preference -> track
+Show audio as spectrogram. You also can set the spectrogram representation as default. edit -> preference -> track
 
 ![select_spec](./imgs/select_spec.png)
 
@@ -80,7 +80,7 @@ Then an annotation for an audio file done!
 #### training
 Set the parameter in `utils` / `config.py`. Set the `dataset` as the folder name of your custom dataset and the `model_name` as you want. Adjust appropriately the `epochs` and `batch_size` according to your device and dataset.
 
-**if you don't 100% sure the consequence of adjusting any other parameter, just don't touch it**
+*if you don't 100% sure the consequence after adjusting any other parameter, just don't touch it*
 
 ``` python
 training_config = {
