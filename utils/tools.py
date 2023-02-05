@@ -106,20 +106,23 @@ class PrograssBar:
         progress = "█" * ((i * 20) // num_sample)
         unprogess = " " * (20 - (i * 20) // num_sample)
         percent = "%s/%s" % (i, num_sample)
-        loss = _fill_zero(loss)
-        accuracy = _fill_zero(accuracy)
-        percision = _fill_zero(percision)
-        recall = _fill_zero(recall)
-        f1_score = _fill_zero(f1_score)
+        loss = PrograssBar._fill_zero(loss)
+        accuracy = PrograssBar._fill_zero(accuracy)
+        percision = PrograssBar._fill_zero(percision)
+        recall = PrograssBar._fill_zero(recall)
+        f1_score = PrograssBar._fill_zero(f1_score)
 
         print(
-            f"\r{loss}{accuracy}{percision}{recall}{f1_score} [{progress}{unprogess}] {percent}     epoch {epoch}/{num_epoch}",
+            f"\r{loss}{accuracy}{percision}{recall}{f1_score} [{progress}{unprogess}] {percent}   epoch {epoch}/{num_epoch}",
             end="",
         )
 
     @staticmethod
     def line_break():
         print("\r")
+
+    def _fill_zero(string, l=11):
+        return "%s%s" % (str(string), " " * (l - len(str(string))))
 
 
 def save_model(best_model, last_model, indicator: DataFrame, model_name: str = "exp"):
@@ -150,10 +153,6 @@ def save_model(best_model, last_model, indicator: DataFrame, model_name: str = "
     log_path = PurePath.joinpath(Path(new_model_name), Path("training_log.csv"))
     indicator.to_csv(log_path, index=False)
     print("results have been saved to %s" % new_model_name)
-
-
-def _fill_zero(string, l=11):
-    return "%s%s" % (str(string), " " * (l - len(str(string))))
 
 
 if __name__ == "__main__":
