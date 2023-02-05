@@ -24,6 +24,16 @@ def restri_batch_size(x):
     return x
 
 
+def restri_threshold(arg):
+    try:
+        arg = float(arg)
+    except ValueError:
+        raise argparse.ArgumentTypeError("Must be a floating point number")
+    if arg <= 0 or arg >= 1:
+        raise argparse.ArgumentTypeError("Argment must be between 0 and 1")
+    return arg
+
+
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--model", type=str, help="path of model", required=True)
@@ -39,6 +49,13 @@ def parse_opt():
     )
     parser.add_argument(
         "-i", "--interval", type=float, help="interval of probability", default=0.5
+    )
+    parser.add_argument(
+        "-t",
+        "--threshold",
+        default=0.5,
+        type=restri_threshold,
+        help="the threshold of probability of target detected",
     )
 
     args = parser.parse_args()
@@ -58,7 +75,7 @@ def predict(model, loader, model_info, device="cpu"):
     hop = model_info["n_fft"] // 2
     piece_width = target_sr * sample_duration // hop + 1
 
-    results = defaultdict(list)
+    proba_seq = defaultdict(list)
 
     for audio, paths in tqdm(loader):
         audio.to(device)
@@ -71,12 +88,22 @@ def predict(model, loader, model_info, device="cpu"):
             for pred, path in zip(prediction.squeeze(1), paths):
                 filename = os.path.basename(path)
                 if i < len(start_points) - 1:
-                    results[filename] += torch.round(pred, decimals=4).tolist()
+                    proba_seq[filename] += torch.round(pred, decimals=4).tolist()
                 else:
-                    res_start = audio.shape[3] - len(results[filename])
+                    res_start = audio.shape[3] - len(proba_seq[filename])
                     res_pre = torch.round(pred, decimals=4).tolist()[-res_start:]
-                    results[filename] += res_pre
-    return results
+                    proba_seq[filename] += res_pre
+    return proba_seq
+
+
+def target_coverage(
+    seq: list, threshold: float, sample_rate: int, mel_hop: int
+) -> list:
+    piece_sec = 1 / sample_rate * mel_hop
+    true_count = sum([1 for p in seq if p > threshold])
+    coverage = round(true_count * piece_sec, 2)
+    proportion = round(true_count / len(seq), 3)
+    return coverage, proportion
 
 
 def extract_max_in_interval(predictions, interval, model_info) -> list:
@@ -101,8 +128,12 @@ def extract_max_in_interval(predictions, interval, model_info) -> list:
     return results
 
 
-def save_result(result: pd.DataFrame, save_path, time_stemp=True):
-    filename = "result"
+def save_result(
+    result: pd.DataFrame,
+    save_path,
+    filename="results",
+    time_stemp=True,
+):
     ext = ".csv"
     if time_stemp:
         time_now = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
@@ -121,8 +152,12 @@ def main():
     source_path = opt.source
     batch_size = opt.batch
     interval = opt.interval
-    print(model_path)
+    threshold = opt.threshold
+
     model_info = read_predict_config(model_path)
+
+    target_sr = model_info["target_sample_rate"]
+    mel_hop = model_info["n_fft"] // 2
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -138,21 +173,22 @@ def main():
     )
     predictions = predict(model, predict_loader, model_info, device=device)
 
-    results = {
-        "file_name": [],
-        "time_s": [],
-        "probability": [],
-    }
+    proba_seq = defaultdict(list)
+    targ_cov = defaultdict(list)
 
     for k, v in predictions.items():
-        predictions[k] = extract_max_in_interval(v, interval, model_info)
-        results["file_name"] += [k] * len(predictions[k])
-        results["time_s"] += [
-            round(interval * i, 1) for i in range(len(predictions[k]))
-        ]
-        results["probability"] += predictions[k]
+        extract = extract_max_in_interval(v, interval, model_info)
+        proba_seq["file_name"] += [k] * len(extract)
+        proba_seq["time_s"] += [round(interval * i, 1) for i in range(len(extract))]
+        proba_seq["probability"] += extract
 
-    save_result(pd.DataFrame(results), source_path)
+        cov, prop = target_coverage(v, threshold, target_sr, mel_hop)
+        targ_cov["file_name"].append(k)
+        targ_cov["coverage"].append(cov)
+        targ_cov["proportion"].append(prop)
+
+    save_result(pd.DataFrame(proba_seq), source_path, filename="probabiliy_sequence")
+    save_result(pd.DataFrame(targ_cov), source_path, filename="target_coverage")
 
 
 if __name__ == "__main__":
