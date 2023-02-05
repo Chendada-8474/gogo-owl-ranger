@@ -155,5 +155,12 @@ def save_model(best_model, last_model, indicator: DataFrame, model_name: str = "
     print("results have been saved to %s" % new_model_name)
 
 
+def get_device_info(device):
+    torch_version = "%s %s" % ("torch", torch.__version__)
+    device_name = torch.cuda.get_device_name() if device == "cuda" else None
+    device_number = torch.cuda.current_device() if device == "cuda" else None
+    return f"{torch_version} CUDA:{device_number} {device_name}"
+
+
 if __name__ == "__main__":
     pass

@@ -6,11 +6,11 @@ import pandas as pd
 from torch.utils.data import DataLoader
 from pathlib import Path, PurePath
 from tqdm import tqdm
+from datetime import datetime
+from collections import defaultdict
 from utils.model import CRNN
 from utils.dataset import PredictDataset
-from collections import defaultdict
-from utils.tools import slice_piece
-from datetime import datetime
+from utils.tools import slice_piece, get_device_info
 
 
 def restri_batch_size(x):
@@ -160,6 +160,8 @@ def main():
     mel_hop = model_info["n_fft"] // 2
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    device_info = get_device_info()
+    print(device_info)
 
     model = CRNN()
     model.load_state_dict(torch.load(model_path))

@@ -5,7 +5,13 @@ from torch.utils.data import DataLoader
 from utils.dataset import GoGoDataset
 from utils.model import CRNN
 from utils.config import *
-from utils.tools import slice_piece, skip_false_sample, save_model, PrograssBar
+from utils.tools import (
+    slice_piece,
+    skip_false_sample,
+    save_model,
+    get_device_info,
+    PrograssBar,
+)
 from utils.evaluate import evaluate
 
 
@@ -96,13 +102,6 @@ def train(
     )
 
     return model, best_model, training_indicator
-
-
-def get_device_info(device):
-    torch_version = "%s %s" % ("torch", torch.__version__)
-    device_name = torch.cuda.get_device_name() if device == "cuda" else None
-    device_number = torch.cuda.current_device() if device == "cuda" else None
-    return f"{torch_version} CUDA:{device_number} {device_name}"
 
 
 def main():
