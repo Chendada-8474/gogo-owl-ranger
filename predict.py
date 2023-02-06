@@ -154,25 +154,33 @@ def save_result(
     print("results have been save to %s" % save_path)
 
 
-def detect_mode(predictions, model_info, interval, threshold, source_path):
+def detect_mode(predictions: dict, model_info, interval, threshold, source_path):
     target_sr = model_info["target_sample_rate"]
     mel_hop = model_info["n_fft"] // 2
-    proba_seq = defaultdict(list)
-    targ_cov = defaultdict(list)
+    piece_sec = 1 / target_sr * mel_hop
+
+    detected = defaultdict(list)
 
     for k, v in predictions.items():
-        extract = extract_max_in_interval(v, interval, model_info)
-        proba_seq["file_name"] += [k] * len(extract)
-        proba_seq["time_s"] += [round(interval * i, 1) for i in range(len(extract))]
-        proba_seq["probability"] += extract
+        time_start = None
+        sum_p, count = 0, 0
+        for i, p in enumerate(v):
+            if not time_start and p > threshold:
+                time_start = i * piece_sec
+                sum_p += p
+                count += 1
+            elif time_start:
+                if p <= threshold:
+                    detected["file_name"].append(k)
+                    detected["start"].append(round(time_start, 2))
+                    detected["end"].append(round(i * piece_sec, 2))
+                    detected["average_probability"].append(round(sum_p / count, 4))
+                    time_start, sum_p, count = None, 0, 0
+                else:
+                    sum_p += p
+                    count += 1
 
-        cov, prop = target_coverage(v, threshold, target_sr, mel_hop)
-        targ_cov["file_name"].append(k)
-        targ_cov["coverage"].append(cov)
-        targ_cov["proportion"].append(prop)
-
-    save_result(pd.DataFrame(proba_seq), source_path, filename="probabiliy_sequence")
-    save_result(pd.DataFrame(targ_cov), source_path, filename="target_coverage")
+    save_result(pd.DataFrame(detected), source_path, filename="results")
 
 
 def main():
