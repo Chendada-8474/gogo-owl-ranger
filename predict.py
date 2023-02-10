@@ -214,7 +214,7 @@ def main():
     if mode == "detect":
         detect_mode(predictions, model_info, interval, threshold, source_path)
     elif mode == "animation":
-        animate_mode(predictions, predict_set, source_path, model_info, device)
+        animate_mode(predictions, predict_set, model_info, device, source_path)
 
 
 if __name__ == "__main__":
