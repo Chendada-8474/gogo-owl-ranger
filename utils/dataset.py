@@ -3,6 +3,7 @@ import torch
 import torchaudio
 import torchaudio.transforms as AT
 import torchvision.transforms as VT
+import pandas as pd
 from pathlib import Path, PurePath
 from torch.utils.data import Dataset, dataset
 from torch_audiomentations import Compose, Gain
@@ -133,7 +134,7 @@ class GoGoDataset(Dataset):
             return new_annotation
 
         annotation_path = self._get_annotation_path(annotation_filename)
-        time_ranges = self._read_annotation_txt(annotation_path)
+        time_ranges = self._read_annotation(annotation_path)
 
         for s, e in time_ranges:
             s = self._scale_range_for_spec(s, spectrogram_width, ori_num_sample)
@@ -146,11 +147,19 @@ class GoGoDataset(Dataset):
         num = (num / (ori_num_sample / self.target_sample_rate)) * spectrogram_width
         return num
 
-    def _read_annotation_txt(self, txt_path):
+    def _read_annotation(self, annotation_path):
         time_ranges = []
-        with open(txt_path, "r", encoding="utf-8") as f:
-            for line in f.readlines():
-                time_ranges.append([float(l) for l in line.split("\t")[:2]])
+        file_name, extension = os.path.splitext(annotation_path)
+        if extension.lower() == ".txt":
+            with open(annotation_path, "r", encoding="utf-8") as f:
+                for line in f.readlines():
+                    time_ranges.append([float(l) for l in line.split("\t")[:2]])
+        elif extension.lower() == ".csv":
+            csv_anno = pd.read_csv(annotation_path)
+            for time_begin, time_end in zip(
+                csv_anno["time_begin"], csv_anno["time_end"]
+            ):
+                time_ranges.append([time_begin / 1000, time_end / 1000])
         return time_ranges
 
 
