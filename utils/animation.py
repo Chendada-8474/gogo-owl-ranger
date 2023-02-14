@@ -41,17 +41,7 @@ def make_plot_iter(spectrogram, prediction, duration_in_s):
     spec_starts = (round(s * spec_len_per_window) for s in range(num_frames))
     spec_iter = (spectrogram[:, s : s + spec_window_size] for s in spec_starts)
 
-    # test_index = -1
-    # fig, axs = plt.subplots(2)
-    # axs[0].plot(pred_iter[test_index])
-    # axs[0].set_xlim(0, len(pred_iter[test_index]))
-    # axs[0].set_ylim(-0.05, 1)
-    # axs[1].imshow(spec_iter[test_index], origin="lower", aspect="auto")
-    # axs[1].set_xlim(0, spec_iter[test_index].shape[1])
-    # plt.show()
-    # exit()
-
-    return zip(pred_iter, spec_iter)
+    return zip(list(range(num_frames)), pred_iter, spec_iter)
 
 
 def save_video(ani, path):
@@ -70,10 +60,11 @@ def save_merge_sound(video_path, audio_path):
 
 
 def animate_mode(predictions: dict, dateset, model_info, device, source_path):
+    assert not os.path.isdir(
+        source_path
+    ), "animation mode doesn't support the directory path"
     for fn, pred in predictions.items():
         audio_path = source_path
-        if os.path.isdir(source_path):
-            audio_path = PurePath.joinpath(Path(source_path), Path(fn))
         signal, sr = torchaudio.load(audio_path)
         duration = signal.size()[1] / sr
         spectrogram = spec_trans(signal)
@@ -85,12 +76,18 @@ def animate_mode(predictions: dict, dateset, model_info, device, source_path):
         def plot_func(plot_iter):
             axs[0].clear()
             axs[1].clear()
-            pred, spec = plot_iter
+            index, pred, spec = plot_iter
             num_pred = len(pred)
+
             probabiliy = round(pred[len(pred) // 2 - 1], 4)
+            time = index * FRAME_INTERVAL / 1000
+
+            minute = round(time // 60)
+            second = round(time % 60, 2)
             axs[0].plot(pred)
             axs[0].plot([num_pred // 2, num_pred // 2], [-0.05, 1], "r-", lw=2)
-            axs[0].text(0, 1.05, f"probabiliy: {probabiliy}", color="r")
+            axs[0].text(0, 1.05, f"time: {minute}:{second}", color="r")
+            axs[0].text(num_pred // 2 + 5, 0.9, f"probabiliy: {probabiliy}", color="r")
             axs[0].set_xlim(0, num_pred)
             axs[0].set_ylim(-0.05, 1)
             axs[1].imshow(spec, origin="lower", aspect="auto")
