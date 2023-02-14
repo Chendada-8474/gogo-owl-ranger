@@ -1,6 +1,7 @@
 import os
 import random
 import torch
+from datetime import datetime
 from pathlib import Path, PurePath
 from pandas import DataFrame
 from utils.config import *
@@ -145,10 +146,15 @@ def save_model(best_model, last_model, indicator: DataFrame, model_name: str = "
     )
 
     info_path = PurePath.joinpath(Path(new_model_name), Path("model_info.yaml"))
+    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     with open(info_path, "w") as info:
+        info.write("train_datetime: %s\n" % current_datetime)
         for k, v in pre_prosessing_config.items():
             info.write("%s: %s\n" % (k, v))
         for k, v in mel_specrogram_config.items():
+            info.write("%s: %s\n" % (k, v))
+        for k, v in training_config.items():
             info.write("%s: %s\n" % (k, v))
 
     log_path = PurePath.joinpath(Path(new_model_name), Path("training_log.csv"))
