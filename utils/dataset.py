@@ -11,6 +11,7 @@ from utils.config import mel_specrogram_config
 from math import ceil
 
 DATASETS_DIR = PurePath.joinpath(Path(__file__).parent.parent, Path("datasets"))
+ANNOTATION_EXTENSIONS = (".txt", ".csv")
 
 
 class GoGoDataset(Dataset):
@@ -123,24 +124,26 @@ class GoGoDataset(Dataset):
         return PurePath.joinpath(Path(__file__).parent.parent, Path("datasets"))
 
     def _generate_annotation(self, index, spectrogram_width, ori_num_sample):
-        annotation_filename = "%s.%s" % (
-            os.path.splitext(self.sample_names[index])[0],
-            "txt",
-        )
+        annotation_filename = os.path.splitext(self.sample_names[index])[0]
+        annotation_ext_fns = [
+            "%s%s" % (annotation_filename, ext) for ext in ANNOTATION_EXTENSIONS
+        ]
 
         new_annotation = [0] * spectrogram_width
 
-        if annotation_filename not in self.annotations:
-            return new_annotation
+        for ext_fn in annotation_ext_fns:
+            if ext_fn not in self.annotations:
+                continue
 
-        annotation_path = self._get_annotation_path(annotation_filename)
-        time_ranges = self._read_annotation(annotation_path)
+            annotation_path = self._get_annotation_path(ext_fn)
+            time_ranges = self._read_annotation(annotation_path)
 
-        for s, e in time_ranges:
-            s = self._scale_range_for_spec(s, spectrogram_width, ori_num_sample)
-            e = self._scale_range_for_spec(e, spectrogram_width, ori_num_sample)
-            for time_point in range(int(s), ceil(e) + 1):
-                new_annotation[time_point] = 1
+            for s, e in time_ranges:
+                s = self._scale_range_for_spec(s, spectrogram_width, ori_num_sample)
+                e = self._scale_range_for_spec(e, spectrogram_width, ori_num_sample)
+                for time_point in range(int(s), ceil(e)):
+                    new_annotation[time_point] = 1
+
         return new_annotation
 
     def _scale_range_for_spec(self, num, spectrogram_width, ori_num_sample):
@@ -150,16 +153,19 @@ class GoGoDataset(Dataset):
     def _read_annotation(self, annotation_path):
         time_ranges = []
         file_name, extension = os.path.splitext(annotation_path)
+
         if extension.lower() == ".txt":
             with open(annotation_path, "r", encoding="utf-8") as f:
                 for line in f.readlines():
                     time_ranges.append([float(l) for l in line.split("\t")[:2]])
+
         elif extension.lower() == ".csv":
             csv_anno = pd.read_csv(annotation_path)
             for time_begin, time_end in zip(
                 csv_anno["time_begin"], csv_anno["time_end"]
             ):
                 time_ranges.append([time_begin / 1000, time_end / 1000])
+
         return time_ranges
 
 
