@@ -14,11 +14,11 @@ mel_specrogram_config = {
 }
 
 training_config = {
-    "epochs": 5,  # number of training epoch
+    "epochs": 10,  # number of training epoch
     "learning_rate": 0.0005,
     "batch_size": 32,
-    "dataset": "grassowl",  # traning dataset folder name
+    "dataset": "gogo-nightjar",  # traning dataset folder name
     "cpu_workers": cpu_count() // 2,
     "skip_false_rate": 0.6,  # The probability skip the training window if all annotations are 0
-    "model_name": "grassowl",  # folder name of training outpout
+    "model_name": "nightjar",  # folder name of training outpout
 }

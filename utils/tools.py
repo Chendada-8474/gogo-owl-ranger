@@ -127,6 +127,7 @@ class PrograssBar:
 
 def save_model(best_model, last_model, indicator: DataFrame, model_name: str = "exp"):
     models_dir = PurePath.joinpath(Path(ROOT_DIR), Path("models"))
+    Path(models_dir).mkdir(parents=True, exist_ok=True)
     new_model_name = PurePath.joinpath(models_dir, Path(model_name))
     num = 1
     while new_model_name.exists():
