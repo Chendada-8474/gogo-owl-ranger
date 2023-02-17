@@ -9,16 +9,17 @@ pre_prosessing_config = {
 mel_specrogram_config = {
     "n_fft": 512,
     "n_mels": 64,
-    "f_min": 1,
-    "f_max": pre_prosessing_config["target_sample_rate"] // 2,
+    "f_min": 1000,
+    # "f_max": pre_prosessing_config["target_sample_rate"] // 2,
+    "f_max": 4000,
 }
 
 training_config = {
-    "epochs": 3,  # number of training epoch
+    "epochs": 5,  # number of training epoch
     "learning_rate": 0.0005,
-    "batch_size": 32,
+    "batch_size": 64,
     "dataset": "grassowl",  # traning dataset folder name
-    "cpu_workers": cpu_count() // 2,
-    "skip_false_rate": 0.6,  # The probability skip the training window if all annotations are 0
+    "cpu_workers": cpu_count(),
+    "skip_false_rate": 0.8,  # The probability skip the training window if all annotations are 0
     "model_name": "grassowl",  # folder name of training outpout
 }

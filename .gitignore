@@ -134,6 +134,7 @@ dmypy.json
 #init file
 init.yaml
 
+config.py
 test.py
 data
 python-venv
