@@ -6,15 +6,6 @@ A simple tool for training your custom audio samples and predicting base on CRNN
 Logo was designed by [仲華](https://www.instagram.com/zhliu.art).
 All of you had better go and see her [fan page](https://www.facebook.com/zhliu.art).
 
-<a herf="https://www.facebook.com/zhliu.art">
-<img alt="facebook" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/facebook.svg" />
-</a>
-<a herf="https://www.instagram.com/zhliu.art">
-<img alt="instagram" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/instagram.svg" />
-</a>
-
-<br>
-
 ## Support
 ### 綠界科技
 <a href="https://p.ecpay.com.tw/0696F33"><img src="https://www.ecpay.com.tw/Content/images/logo_pay200x55.png"/></a>
