@@ -1,10 +1,10 @@
 # Go Go Owl Ranger
-![gogo owl ranger logo](./imgs/logo.png#gh-dark-mode-only)
-![gogo owl ranger logo](./imgs/logo.png#gh-light-mode-only)
+![gogo owl ranger logo](./imgs/logo_light.png#gh-dark-mode-only)
+![gogo owl ranger logo](./imgs/logo_dark.png#gh-light-mode-only)
 A simple tool for training your custom audio samples and predicting base on CRNN architecture. It can predict probabiliy squences from each single window of spectrogram. It is suitable for detecting certain target signal from passive acoustic monitoring.
 
-Logo was designed by 仲華.
-All of you had better go to her fan pages.
+Logo was designed by [仲華](https://www.instagram.com/zhliu.art).
+All of you had better go and see her [fan page](https://www.facebook.com/zhliu.art).
 
 <a herf="https://www.facebook.com/zhliu.art">
 <img alt="facebook" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/facebook.svg" />
@@ -127,5 +127,6 @@ python3 predict.py -m models/yourmodel/best.pth -s path/to/your/data -b 16
 | `--source`    | `-s`         |         | true    | target wav file or folder |
 | `--interval`  | `-i`         | 0.5     |         | the interval (s) of probability sequence results, the probability is the maximun of all the origin sequence from model in an interval |
 | `--threshold` | `-t`         | 0.5     |         | probability threshold of presence or absence of target sound (when caculating the `target_coverage.csv`), range 0 ~ 1 |
+| `--mode`     | `-mo`         | detect  | true    | set animation to make demo detecting vedio. [like this](https://youtu.be/7yHSQ6Qb-y0). |
 
 results are saved as `probability_sequence.csv` and `target_coverage.csv` under the folder of source files.
