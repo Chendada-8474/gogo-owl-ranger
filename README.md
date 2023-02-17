@@ -4,6 +4,9 @@ A simple tool for training your custom audio samples and predicting base on CRNN
 
 Logo was designed by 仲華.
 All of you had better go to her fan pages.
+[<img align="left" alt="twtrubiks | Facebook" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/facebook.svg" />][facebook]
+[<img align="left" alt="twtrubiks | Facebook" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/instagram.svg" />][instagram]
+
 <br>
 <a href="https://www.facebook.com/zhliu.art">
 <span src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/d02961b018153506364077343b0edcde0a39d27e/svgs/brands/instagram.svg" width="50" height="50" style="color:rgb(66, 103, 178)">
