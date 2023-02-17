@@ -6,8 +6,13 @@ Logo was designed by 仲華.
 All of you had better go to her fan pages.
 
 <br>
-[<img align="left" alt="twtrubiks | Facebook" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/facebook.svg" />](https://www.facebook.com/zhliu.art)
+<a herf="https://www.facebook.com/zhliu.art">
+<img align="left" alt="twtrubiks | Facebook" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/facebook.svg" />
+</a>
+
+<a herf="https://www.instagram.com/zhliu.art">
 [<img align="left" alt="twtrubiks | Facebook" width="22px" src="https://cdn.jsdelivr.net/npm/simple-icons@v3/icons/instagram.svg" />](https://www.instagram.com/zhliu.art/)
+</a>
 
 <br>
 
