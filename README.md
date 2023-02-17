@@ -1,6 +1,15 @@
 # Go Go Owl Ranger
-![gogo owl ranger logo](./imgs/logo.png)
+![gogo owl ranger logo](./imgs/logo.png#gh-light-mode-only)
 A simple tool for training your custom audio samples and predicting base on CRNN architecture. It can predict probabiliy squences from each single window of spectrogram. It is suitable for detecting certain target signal from passive acoustic monitoring.
+
+Logo was designed by 仲華.
+All of you had better go to her fan pages.
+<a href="https://www.facebook.com/zhliu.art">
+<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/d02961b018153506364077343b0edcde0a39d27e/svgs/brands/instagram.svg" width="50" height="50">
+</a>
+<a href="https://www.instagram.com/zhliu.art/">
+<img src="https://raw.githubusercontent.com/FortAwesome/Font-Awesome/d02961b018153506364077343b0edcde0a39d27e/svgs/brands/facebook-f.svg" width="50" height="50">
+</a>
 
 ## Support
 ### 綠界科技
