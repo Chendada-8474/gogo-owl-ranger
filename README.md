@@ -130,7 +130,7 @@ python3 predict.py -m models/yourmodel/best.pth -s path/to/your/data -b 16
 | `--batch`     | `-b`         |         | true    | batch size  |
 | `--source`    | `-s`         |         | true    | target wav file or folder |
 | `--interval`  | `-i`         | 0.5     |         | the interval (s) of probability sequence results, the probability is the maximun of all the origin sequence from model in an interval |
-| `--threshold` | `-t`         | 0.5     |         | probability threshold of presence or absence of target sound (when caculating the `target_coverage.csv`), range 0 ~ 1 |
+| `--threshold` | `-t`         | 0.5     |         | probability threshold of presence or absence of target sound, range 0 ~ 1 |
 | `--mode`     | `-mo`         | detect  | true    | set animation to make demo detecting vedio. [like this](https://youtu.be/7yHSQ6Qb-y0). |
 
-results are saved as `result_<time stamp>` under the folder of source files.
+results will be saved in the folder of source files.
