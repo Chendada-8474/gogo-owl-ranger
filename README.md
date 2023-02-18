@@ -5,7 +5,7 @@ A simple tool for training your custom audio samples and predicting base on CRNN
 
 Logo was designed by [仲華](https://www.instagram.com/zhliu.art).
 All of you had better go and see her [fan page](https://www.facebook.com/zhliu.art).
-f
+
 ## Support
 ### 綠界科技
 <a href="https://p.ecpay.com.tw/0696F33"><img src="https://www.ecpay.com.tw/Content/images/logo_pay200x55.png"/></a>
@@ -114,8 +114,9 @@ tensorboard --logdir=runs
 
 Open http://127.0.0.1:6006/ in your browser.
 
-![](./imgs/tensorboard_localhost.png)
+![tensorboard localhost url in browser](./imgs/tensorboard_localhost.png)
 
+![tensorboard](./imgs/tensorboard.png)
 
 ### Predict
 
