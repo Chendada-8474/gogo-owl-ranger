@@ -105,6 +105,18 @@ Then run the `train.py`
 python3 train.py
 ```
 
+#### Tensorboard
+
+Each training result will be saved. You can run Tensorboard local to see the training log.
+```
+tensorboard --logdir=runs
+```
+
+Open http://127.0.0.1:6006/ in your browser.
+
+![](./imgs/tensorboard_localhost.png)
+
+
 ### Predict
 
 ```
@@ -120,4 +132,4 @@ python3 predict.py -m models/yourmodel/best.pth -s path/to/your/data -b 16
 | `--threshold` | `-t`         | 0.5     |         | probability threshold of presence or absence of target sound (when caculating the `target_coverage.csv`), range 0 ~ 1 |
 | `--mode`     | `-mo`         | detect  | true    | set animation to make demo detecting vedio. [like this](https://youtu.be/7yHSQ6Qb-y0). |
 
-results are saved as `probability_sequence.csv` and `target_coverage.csv` under the folder of source files.
+results are saved as `result_<time stamp>` under the folder of source files.

@@ -2,6 +2,7 @@ import torch
 import pandas as pd
 import numpy as np
 from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
 from utils.dataset import GoGoDataset
 from utils.model import CRNN
 from utils.config import *
@@ -28,6 +29,7 @@ SKIP_FALSE_RATE = training_config["skip_false_rate"]
 HOP = mel_specrogram_config["n_fft"] // 2
 
 progbar = PrograssBar()
+writer = SummaryWriter()
 
 
 def train(
@@ -95,6 +97,14 @@ def train(
         training_indicator.append(
             [i + 1, epoch_loss, accuracy, percision, recall, f1_score]
         )
+
+        percision = percision if percision else 0
+        recall = recall if recall else 0
+        f1_score = f1_score if f1_score else 0
+
+        writer.add_scalar("accuracy", accuracy, i)
+        writer.add_scalar("loss", epoch_loss, i)
+        writer.add_scalar("f1_score", f1_score, i)
 
     training_indicator = pd.DataFrame(
         np.array(training_indicator),

@@ -16,6 +16,7 @@ class CRNN(nn.Module):
 
     def _cnn_backbone(self):
 
+        dropout = nn.Dropout(0.25)
         leaky_relu = nn.LeakyReLU()
         cnn_backbone = nn.Sequential()
         num_channel = 96
@@ -29,8 +30,9 @@ class CRNN(nn.Module):
                 padding=1,
             ),
         )
-
+        cnn_backbone.add_module("batchnorm0", nn.BatchNorm2d(num_channel))
         cnn_backbone.add_module("ReLu0", leaky_relu)
+        cnn_backbone.add_module("dropout0", dropout)
         cnn_backbone.add_module("MaxPool2d0", nn.MaxPool2d(kernel_size=(4, 1)))
 
         cnn_backbone.add_module(
@@ -43,8 +45,9 @@ class CRNN(nn.Module):
                 padding=1,
             ),
         )
-
+        cnn_backbone.add_module("batchnorm1", nn.BatchNorm2d(num_channel))
         cnn_backbone.add_module("ReLu1", leaky_relu)
+        cnn_backbone.add_module("dropout1", dropout)
         cnn_backbone.add_module("MaxPool2d1", nn.MaxPool2d(kernel_size=(4, 1)))
 
         cnn_backbone.add_module(
@@ -58,8 +61,9 @@ class CRNN(nn.Module):
             ),
         )
 
-        cnn_backbone.add_module("batchnorm0", nn.BatchNorm2d(num_channel))
+        cnn_backbone.add_module("batchnorm2", nn.BatchNorm2d(num_channel))
         cnn_backbone.add_module("ReLu2", leaky_relu)
+        cnn_backbone.add_module("dropout2", dropout)
         cnn_backbone.add_module("MaxPool2d2", nn.MaxPool2d(kernel_size=(2, 1)))
 
         cnn_backbone.add_module(
@@ -73,8 +77,9 @@ class CRNN(nn.Module):
             ),
         )
 
-        cnn_backbone.add_module("batchnorm1", nn.BatchNorm2d(num_channel))
+        cnn_backbone.add_module("batchnorm3", nn.BatchNorm2d(num_channel))
         cnn_backbone.add_module("ReLu3", leaky_relu)
+        cnn_backbone.add_module("dropout3", dropout)
         cnn_backbone.add_module("MaxPool2d3", nn.MaxPool2d(kernel_size=(2, 1)))
 
         return cnn_backbone
