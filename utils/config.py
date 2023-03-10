@@ -15,9 +15,9 @@ mel_specrogram_config = {
 }
 
 training_config = {
-    "epochs": 10,  # number of training epoch
+    "epochs": 4,  # number of training epoch
     "learning_rate": 0.001,
-    "batch_size": 32,
+    "batch_size": 2,
     "dataset": "gogo-nightjar",  # traning dataset folder name
     "cpu_workers": cpu_count(),
     "skip_false_rate": 0.6,  # The probability skip the training window if all annotations are 0

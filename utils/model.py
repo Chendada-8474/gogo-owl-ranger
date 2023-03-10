@@ -8,10 +8,10 @@ class CRNN(nn.Module):
         super(CRNN, self).__init__()
 
         self.backbone = self._cnn_backbone()
-        self.map_to_seq = nn.Linear(96, 96)
-        self.rnn1 = nn.LSTM(96, 96, bidirectional=True, batch_first=True)
-        self.rnn2 = nn.LSTM(192, 96, bidirectional=True, batch_first=True)
-        self.dense = nn.Linear(192, 1)
+        self.map_to_seq = nn.Linear(512, 256)
+        self.rnn1 = nn.LSTM(256, 256, bidirectional=True, batch_first=True)
+        self.rnn2 = nn.LSTM(512, 256, bidirectional=True, batch_first=True)
+        self.dense = nn.Linear(512, 1)
         self.sigmoid = nn.Sigmoid()
 
     def _cnn_backbone(self):
@@ -19,18 +19,18 @@ class CRNN(nn.Module):
         dropout = nn.Dropout(0.25)
         leaky_relu = nn.LeakyReLU()
         cnn_backbone = nn.Sequential()
-        num_channel = 96
+        # num_channel = 96
         cnn_backbone.add_module(
             "cnn0",
             nn.Conv2d(
                 in_channels=1,
-                out_channels=num_channel,
+                out_channels=128,
                 kernel_size=3,
                 stride=1,
                 padding=1,
             ),
         )
-        cnn_backbone.add_module("batchnorm0", nn.BatchNorm2d(num_channel))
+        cnn_backbone.add_module("batchnorm0", nn.BatchNorm2d(128))
         cnn_backbone.add_module("ReLu0", leaky_relu)
         cnn_backbone.add_module("dropout0", dropout)
         cnn_backbone.add_module("MaxPool2d0", nn.MaxPool2d(kernel_size=(4, 1)))
@@ -38,14 +38,14 @@ class CRNN(nn.Module):
         cnn_backbone.add_module(
             "cnn1",
             nn.Conv2d(
-                in_channels=num_channel,
-                out_channels=num_channel,
+                in_channels=128,
+                out_channels=256,
                 kernel_size=3,
                 stride=1,
                 padding=1,
             ),
         )
-        cnn_backbone.add_module("batchnorm1", nn.BatchNorm2d(num_channel))
+        cnn_backbone.add_module("batchnorm1", nn.BatchNorm2d(256))
         cnn_backbone.add_module("ReLu1", leaky_relu)
         cnn_backbone.add_module("dropout1", dropout)
         cnn_backbone.add_module("MaxPool2d1", nn.MaxPool2d(kernel_size=(4, 1)))
@@ -53,15 +53,15 @@ class CRNN(nn.Module):
         cnn_backbone.add_module(
             "cnn2",
             nn.Conv2d(
-                in_channels=num_channel,
-                out_channels=num_channel,
+                in_channels=256,
+                out_channels=256,
                 kernel_size=3,
                 stride=1,
                 padding=1,
             ),
         )
 
-        cnn_backbone.add_module("batchnorm2", nn.BatchNorm2d(num_channel))
+        cnn_backbone.add_module("batchnorm2", nn.BatchNorm2d(256))
         cnn_backbone.add_module("ReLu2", leaky_relu)
         cnn_backbone.add_module("dropout2", dropout)
         cnn_backbone.add_module("MaxPool2d2", nn.MaxPool2d(kernel_size=(2, 1)))
@@ -69,15 +69,15 @@ class CRNN(nn.Module):
         cnn_backbone.add_module(
             "cnn3",
             nn.Conv2d(
-                in_channels=num_channel,
-                out_channels=num_channel,
+                in_channels=256,
+                out_channels=512,
                 kernel_size=3,
                 stride=1,
                 padding=1,
             ),
         )
 
-        cnn_backbone.add_module("batchnorm3", nn.BatchNorm2d(num_channel))
+        cnn_backbone.add_module("batchnorm3", nn.BatchNorm2d(512))
         cnn_backbone.add_module("ReLu3", leaky_relu)
         cnn_backbone.add_module("dropout3", dropout)
         cnn_backbone.add_module("MaxPool2d3", nn.MaxPool2d(kernel_size=(2, 1)))
