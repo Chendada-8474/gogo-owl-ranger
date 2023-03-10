@@ -5,7 +5,7 @@ import torchaudio.transforms as AT
 import torchvision.transforms as VT
 import pandas as pd
 from pathlib import Path, PurePath
-from torch.utils.data import Dataset, dataset
+from torch.utils.data import Dataset
 from torch_audiomentations import Compose, Gain
 from utils.config import mel_specrogram_config
 from math import ceil

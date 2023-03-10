@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from torch_audiomentations import Compose, Gain
 from utils.dataset import GoGoDataset
 from utils.model import CRNN
 from utils.config import *
@@ -30,6 +31,7 @@ HOP = mel_specrogram_config["n_fft"] // 2
 
 progbar = PrograssBar()
 writer = SummaryWriter()
+augmentation = Compose(transforms=[Gain()])
 
 
 def train(

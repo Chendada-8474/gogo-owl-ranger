@@ -7,7 +7,7 @@ pre_prosessing_config = {
 }
 
 mel_specrogram_config = {
-    "n_fft": 512,
+    "n_fft": 256,
     "n_mels": 64,
     "f_min": 1000,
     # "f_max": pre_prosessing_config["target_sample_rate"] // 2,
@@ -15,11 +15,11 @@ mel_specrogram_config = {
 }
 
 training_config = {
-    "epochs": 15,  # number of training epoch
-    "learning_rate": 0.0005,
-    "batch_size": 64,
+    "epochs": 10,  # number of training epoch
+    "learning_rate": 0.001,
+    "batch_size": 32,
     "dataset": "gogo-nightjar",  # traning dataset folder name
     "cpu_workers": cpu_count(),
-    "skip_false_rate": 0.8,  # The probability skip the training window if all annotations are 0
+    "skip_false_rate": 0.6,  # The probability skip the training window if all annotations are 0
     "model_name": "nightjar",  # folder name of training outpout
 }
