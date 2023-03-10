@@ -35,7 +35,15 @@ class GoGoDataset(Dataset):
         self.sample_names = self._all_sample_filename()
         self.annotations = self._all_annotations()
         self.device = device
-        self.augmentation = Compose(transforms=[Gain()])
+        self.augmentation = Compose(
+            transforms=[
+                Gain(
+                    min_gain_in_db=-10.0,
+                    max_gain_in_db=3.0,
+                    p=0.5,
+                )
+            ]
+        )
         self.mel_specrogram = AT.MelSpectrogram(
             sample_rate=target_sample_rate,
             n_fft=mel_specrogram_config["n_fft"],
