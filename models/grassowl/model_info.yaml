@@ -1,0 +1,18 @@
+train_datetime: 2023-06-24 02:05:58
+torch: 1.12.1+cu116
+device: 0
+file_duration: 180
+target_sample_rate: 16000
+piece_width: 400
+piece_hop: 200
+n_fft: 512
+hop_length: 256
+n_mels: 80
+f_min: 1000
+f_max: 4000
+epochs: 5
+learning_rate: 0.0005
+batch_size: 24
+dataset: grassowl2
+model_name: grassowl
+skip_false_rate: 0.5
