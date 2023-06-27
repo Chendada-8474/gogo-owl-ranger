@@ -110,7 +110,7 @@ Then run the `train.py`, the model with the best f1 score will be saved.
 python3 train.py
 ```
 
-#### Tensorboard
+<!-- #### Tensorboard
 
 Each training result will be saved. You can run Tensorboard local to see the training log.
 ```
@@ -121,7 +121,7 @@ Open http://127.0.0.1:6006/ in your browser.
 
 ![tensorboard localhost url in browser](./imgs/tensorboard_localhost.png)
 
-![tensorboard](./imgs/tensorboard.png)
+![tensorboard](./imgs/tensorboard.png) -->
 
 ### Detect
 

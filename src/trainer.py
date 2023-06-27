@@ -21,7 +21,7 @@ Path(MODELS_DIR).mkdir(parents=True, exist_ok=True)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 config = GoConfig()
-writer = SummaryWriter()
+# writer = SummaryWriter()
 
 
 class Evaluator:
@@ -130,9 +130,9 @@ class GoTrain:
                 )
 
             accuracy, percision, recall, f1_score = self.evaluator.evaluate(self.model)
-            writer.add_scalar("accuracy", accuracy, i)
-            writer.add_scalar("loss", loss, i)
-            writer.add_scalar("f1_score", f1_score, i)
+            # writer.add_scalar("accuracy", accuracy, i)
+            # writer.add_scalar("loss", loss, i)
+            # writer.add_scalar("f1_score", f1_score, i)
             PrograssBar.evaluate(accuracy, percision, recall, f1_score)
 
             if f1_score > self.best_f1:
