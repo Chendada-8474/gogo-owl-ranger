@@ -29,7 +29,7 @@ class GoResult:
         return len(self._result)
 
     def __str__(self) -> str:
-        lines = []
+        lines = ["GoResults:"]
         lines.append("Number of files: %s" % len(self))
         lines.append("Sample rate: %s" % self.model_info.target_sample_rate)
         lines.append("Audio duration: %f" % self.audio_duration)
@@ -38,7 +38,7 @@ class GoResult:
         lines.append("Minimum Frequency: %s" % self.model_info.f_min)
         lines.append("Maximum Frequency: %s" % self.model_info.f_max)
         lines.append("Filenames: %s" % self.filesnames)
-        return "GoResults:\n%s" % "\n".join(lines)
+        return "\n".join(lines)
 
     @property
     def probs(self):
