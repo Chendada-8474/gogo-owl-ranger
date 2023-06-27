@@ -25,20 +25,19 @@ class GoResult:
             results |= result
         return results
 
+    def __len__(self):
+        return len(self._result)
+
     def __str__(self) -> str:
         lines = []
-        num_frame = len(next(iter(self._result.values())))
-        frame_duration = self.model_info.hop_length * (
-            1 / self.model_info.target_sample_rate
-        )
-        lines.append("Number of files: %s" % len(self._result))
+        lines.append("Number of files: %s" % len(self))
         lines.append("Sample rate: %s" % self.model_info.target_sample_rate)
-        lines.append("Audio duration: %f" % round(num_frame * frame_duration, 4))
-        lines.append("Number of frames per result: %s" % num_frame)
-        lines.append("Frame duration (s): %s" % frame_duration)
+        lines.append("Audio duration: %f" % self.audio_duration)
+        lines.append("Number of frames per result: %s" % self.num_frames)
+        lines.append("Frame duration (s): %s" % self.frame_duration)
         lines.append("Minimum Frequency: %s" % self.model_info.f_min)
         lines.append("Maximum Frequency: %s" % self.model_info.f_max)
-        lines.append("Filenames: %s" % list(self._result.keys()))
+        lines.append("Filenames: %s" % self.filesnames)
         return "GoResults:\n%s" % "\n".join(lines)
 
     @property
@@ -150,6 +149,22 @@ class GoResult:
                 event_probs.append(p)
 
         return events
+
+    @property
+    def num_frames(self):
+        return len(next(iter(self._result.values())))
+
+    @property
+    def frame_duration(self):
+        return self.model_info.hop_length * (1 / self.model_info.target_sample_rate)
+
+    @property
+    def filesnames(self):
+        return list(self._result.keys())
+
+    @property
+    def audio_duration(self):
+        return round(self.num_frames * self.frame_duration, 4)
 
 
 class GoModel:
