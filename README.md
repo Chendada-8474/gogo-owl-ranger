@@ -25,7 +25,7 @@ Go Go Owl Ranger was developed under python 3.9.10
 ### git clone
 Clone repo and install requirements.txt
 ```
-git clone https://gitlab.tatsutomo.site/personal/gogo-owl-ranger.git
+https://github.com/Chendada-8474/gogo-owl-ranger.git
 cd gogo-owl-ranger
 ```
 ### Package

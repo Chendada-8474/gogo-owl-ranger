@@ -135,7 +135,7 @@ class GoTrain:
             # writer.add_scalar("f1_score", f1_score, i)
             PrograssBar.evaluate(accuracy, percision, recall, f1_score)
 
-            if f1_score > self.best_f1:
+            if f1_score and f1_score > self.best_f1:
                 self.best_f1 = f1_score
                 self.best_model = self.model
 
