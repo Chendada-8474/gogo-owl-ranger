@@ -1,13 +1,13 @@
 import os
 import torch
-import pandas as pd
 import numpy as np
+import pandas as pd
 from tqdm import tqdm
-from torch.utils.data import DataLoader
 from src.model import CRNN
-from src.tool import get_device_info
 from src.read import GoModelInfo
 from src.data import GoPredictDataset
+from torch.utils.data import DataLoader
+from src.tool import get_device_info
 
 
 class GoResult:
@@ -41,7 +41,7 @@ class GoResult:
         return "\n".join(lines)
 
     @property
-    def probs(self):
+    def probs(self) -> dict:
         return self._result
 
     def events(self, conf: float = 0.5, min_duration: float = 0.05) -> dict:
@@ -151,19 +151,19 @@ class GoResult:
         return events
 
     @property
-    def num_frames(self):
+    def num_frames(self) -> int:
         return len(next(iter(self._result.values())))
 
     @property
-    def frame_duration(self):
+    def frame_duration(self) -> float:
         return self.model_info.hop_length * (1 / self.model_info.target_sample_rate)
 
     @property
-    def filesnames(self):
+    def filesnames(self) -> list:
         return list(self._result.keys())
 
     @property
-    def audio_duration(self):
+    def audio_duration(self) -> float:
         return round(self.num_frames * self.frame_duration, 4)
 
 
@@ -179,7 +179,7 @@ class GoModel:
         loader = DataLoader(dataset=dataset, batch_size=bs, shuffle=False)
         return GoResult(self.model, loader, self.model_info)
 
-    def _read_model(self, path):
+    def _read_model(self, path) -> CRNN:
         torch.cuda.empty_cache()
         model = CRNN()
         model.load_state_dict(torch.load(path, map_location=torch.device(self._device)))
@@ -188,7 +188,7 @@ class GoModel:
         return model
 
     @property
-    def device(self):
+    def device(self) -> str:
         return self._device
 
     def cpu(self):
@@ -199,5 +199,5 @@ class GoModel:
         self._device = self._device_if_available()
         self.model.to(self._device)
 
-    def _device_if_available(self):
+    def _device_if_available(self) -> str:
         return "cuda" if torch.cuda.is_available() else "cpu"

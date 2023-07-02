@@ -19,12 +19,12 @@ class GoConfig:
 
 
 class GoModelInfo:
-    def __init__(self, model_path) -> None:
+    def __init__(self, model_path: str) -> None:
         self.model_path = model_path
         self._read_info()
 
     @property
-    def info_path(self):
+    def info_path(self) -> str:
         return os.path.join(os.path.dirname(self.model_path), "model_info.yaml")
 
     def _read_info(self):

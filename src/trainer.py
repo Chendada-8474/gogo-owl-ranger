@@ -62,7 +62,7 @@ class Evaluator:
 
 class ModelSaver:
     @staticmethod
-    def mkdir_indexing():
+    def mkdir_indexing() -> str:
         new_model_dir = os.path.join(MODELS_DIR, config.model_name)
         index = 1
 

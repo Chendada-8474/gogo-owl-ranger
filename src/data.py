@@ -81,7 +81,7 @@ class GoSample:
         return spectrogram
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         return os.path.basename(self.path)
 
 
@@ -165,7 +165,7 @@ class GoPredictSample:
         return spec
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         return os.path.basename(self.path)
 
 
@@ -189,7 +189,7 @@ class GoPredictDataset(Dataset):
         return os.path.isdir(self.path)
 
     @property
-    def dirpath(self):
+    def dirpath(self) -> str:
         return self.path if self.isdir else os.path.dirname(self.path)
 
     @property
